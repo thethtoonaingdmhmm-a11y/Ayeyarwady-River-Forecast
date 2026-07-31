@@ -208,12 +208,13 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
     return [0.0] * days_to_get
 
 # ==============================================================================
-# 🎨 UI TITLE SYSTEM & COMPACT CSS STYLING (FIXED SPACING & LINE HEIGHT)
+# 🎨 UI TITLE SYSTEM & ULTRA-COMPACT BOLD CSS STYLING
 # ==============================================================================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
     
+    /* Font နှင့် Global Formatting */
     [data-testid="stMainBlockContainer"] p, 
     [data-testid="stMainBlockContainer"] h1, 
     [data-testid="stMainBlockContainer"] h2, 
@@ -224,12 +225,13 @@ st.markdown("""
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
     }
     
+    /* Screen Outer Padding ကို အနည်းဆုံးအထိ နိမ့်လိုက်ခြင်း */
     [data-testid="stMainBlockContainer"] {
-        max-width: 98% !important;
-        padding-top: 0.2rem !important;
-        padding-bottom: 0.5rem !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        max-width: 99% !important;
+        padding-top: 0.1rem !important;
+        padding-bottom: 0.1rem !important;
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
         margin: 0 auto !important;
     }
     
@@ -238,12 +240,13 @@ st.markdown("""
         height: 0rem !important;
     }
     
+    /* Tabs Padding & Font */
     div[data-testid="stTabs"] button [data-testid="stMarkdownContainer"] p,
     div[data-testid="stTabs"] button p,
     .stTabs [role="tab"] p,
     button[id^="tabs-bndry"] p {
         font-family: 'Pyidaungsu', sans-serif !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: bold !important;
         color: #1e5494 !important;
         padding-top: 0px !important;
@@ -251,50 +254,58 @@ st.markdown("""
     }
     
     label[data-testid="stWidgetLabel"] p {
-        font-size: 14px !important;
+        font-size: 13px !important;
         font-weight: bold !important;
         color: #1e5494 !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 0px !important;
     }
     
     div[data-baseweb="input"] input, div[data-baseweb="select"] * {
-        font-size: 14px !important;
-        height: 38px !important;
+        font-size: 13px !important;
+        height: 34px !important;
     }
     
-    /* 💡 စာကြောင်း ၂ ခုကြား နေရာခွာခြင်း နှင့် အောက်မျဉ်းနှင့် ပိုကပ်စေခြင်း */
+    /* Header Titles */
     .dept-title {
         color: #0b6623;
-        font-size: 20px;
+        font-size: 19px;
         font-weight: bold;
-        line-height: 1.4;       /* စာကြောင်းနှစ်ခု မထပ်အောင် လေဝင်လေထွက် ပေးထားပါသည် */
-        margin-bottom: 4px;     /* အောက်စာကြောင်းနှင့် နည်းနည်းလေး ခွာပေးထားပါသည် */
+        line-height: 1.3;
+        margin-bottom: 2px;
     }
     .dash-title {
         color: #1e5494;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: bold;
-        line-height: 1.3;
+        line-height: 1.2;
         margin-bottom: 0px;
     }
     
-    /* 💡 အောက်မျဉ်း (Divider Margin) ကို အထက်ဘက်သို့ ကပ်လိုက်ခြင်း */
     hr {
-        margin-top: 2px !important;   /* Header နှင့် Horizontal Line ကြား အကွာအဝေးကို နီးနီးကပ်ကပ် ပြုလုပ်ပေးထားပါသည် */
-        margin-bottom: 8px !important;
+        margin-top: 2px !important;
+        margin-bottom: 4px !important;
     }
     
+    /* 💡 DATAFRAME / TABLE STYLING (BOLD & ULTRA-COMPACT ROWS) */
     div[data-testid="stDataFrame"] {
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
         margin-top: 0px !important;
     }
     
+    /* ဇယားကွက်ထဲမှ စာလုံး အကုန်လုံးကို Bold ထူပေးပြီး Size ချိန်ပေးခြင်း */
     div[data-testid="stDataFrame"] * {
-        font-size: 14px !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important; /* Bold ပြုလုပ်ထားပါသည် */
     }
-    
+
+    /* Row Vertical Height များကို ကျုံ့၍ ဇလွန်စခန်းအထိ အကုန်ပေါ်အောင် ပြုလုပ်ခြင်း */
+    div[data-testid="stDataFrame"] [data-testid="stCanvas"] div {
+        line-height: 1.2 !important;
+    }
+
+    /* Streamlit Vertical Layout Gap ကို လျှော့ချခြင်း */
     [data-testid="stVerticalBlock"] > div {
-        gap: 0.3rem !important;
+        gap: 0.15rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -515,12 +526,12 @@ with tab2:
                 st.session_state.summary_results = summary_results
                 st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
 
-    # 📊 Result Table များကို အပေါ်မျက်နှာပြင်တွင် တိုက်ရိုက်ပြသပေးခြင်း
+   # 📊 Result Table ကို Height 580 ထားပေးခြင်းဖြင့် Zalun အထိ တိုက်ရိုက် အကုန်ပေါ်ပါမည်
     if getattr(st.session_state, 'summary_results', None) and len(st.session_state.summary_results) > 0:
         st.dataframe(
             pd.DataFrame(st.session_state.summary_results), 
             use_container_width=True, 
-            height=480 # Screen မျက်နှာပြင် အပြည့်ပေါ်စေရန် တပ်ဆင်ထားပါသည်
+            height=580
         )
         
 # ==============================================================================
