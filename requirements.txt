@@ -1,0 +1,13 @@
+streamlit
+pandas
+numpy
+matplotlib
+tensorflow
+scikit-learn
+joblib
+requests
+# မိမိ၏ requirements.txt ဖိုင်ထဲတွင် အောက်ပါအတိုင်း ဖြစ်နေရပါမည်
+gspread
+gspread-dataframe
+plotly
+oauth2client
