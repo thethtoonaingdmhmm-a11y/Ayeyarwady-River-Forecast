@@ -537,154 +537,169 @@ with tab2:
         )
         
 # ==============================================================================
-# 📊 TAB 3: SELECTIVE GRAPH VIEW PANEL (STABLE & CORRECTED)
+# 📊 TAB 3: SELECTIVE GRAPH VIEW PANEL (OPTIMIZED FOR SINGLE SCREEN)
 # ==============================================================================
 with tab3:
-    st.subheader("📈 Interactive Forecast Hydrograph & Rainfall")
+    # 💡 1. Heading စာလုံး အရွယ်အစားကို compact ဖြစ်အောင် အသေးပြောင်းခြင်း
+    st.markdown("### 📈 Interactive Forecast Hydrograph & Rainfall")
     
     if not st.session_state.get('GLOBAL_GRAPHS_DATA'):
         st.warning("⚠️ ကျေးဇူးပြု၍ '🔮 ခန့်မှန်းချက်တွက်ရန်' Tab တွင် Run Forecast Engine ကို အရင်နှိပ်ပေးပါရန်။")
     else:
-        graph_station_selector = st.selectbox(
-            "📍 Select Station (ကြည့်ရှုလိုသော စခန်းကို ရွေးချယ်ပါ):", 
-            list(stations_list),
-            key="graph_st_selector_plotly_final_fixed"
-        )
+        # 💡 2. Selector နှင့် Button ကို ဘေးချင်းယှဉ် Column အဖြစ် ကျုံ့ထားခြင်း
+        col_sel, col_btn, _ = st.columns([2.5, 1.2, 2.3])
         
-        if st.button("📊 Show Forecast Graph", type="primary", key="btn_trigger_plotly_final_fixed"):
-            st_name = graph_station_selector
+        with col_sel:
+            graph_station_selector = st.selectbox(
+                "📍 Select Station (ကြည့်ရှုလိုသော စခန်းကို ရွေးချယ်ပါ):", 
+                list(stations_list),
+                key="graph_st_selector_plotly_final_fixed"
+            )
             
-            if st_name in st.session_state.GLOBAL_GRAPHS_DATA:
-                p_pkg = st.session_state.GLOBAL_GRAPHS_DATA[st_name]
-                
-                forecast_dates = [pd.to_datetime(d).date() for d in p_pkg['f_dates']]
-                f_wl_vals = p_pkg['f_wl']
-                f_rf_vals = p_pkg['f_rf']
-                
-                observed_dates = []
-                obs_wl = []
-                obs_rf = []
-                
-                if 'ts_extended' in st.session_state and st.session_state.ts_extended is not None:
-                    try:
-                        df_copy = st.session_state.ts_extended.copy()
-                        df_copy['Parsed_Date'] = pd.to_datetime(df_copy['Date'])
-                        
-                        base_date_limit = pd.to_datetime(p_pkg['f_dates'][0]) - pd.Timedelta(days=1)
-                        past_filtered_df = df_copy[df_copy['Parsed_Date'] <= base_date_limit].tail(10)
-                        
-                        observed_dates = past_filtered_df['Parsed_Date'].dt.date.tolist()
-                        
-                        wl_col = f'{st_name}_WL'
-                        rf_col = f'{st_name}_RF'
-                        
-                        if wl_col in past_filtered_df.columns:
-                            obs_wl = past_filtered_df[wl_col].values.tolist()
-                        if rf_col in past_filtered_df.columns:
-                            obs_rf = past_filtered_df[rf_col].values.tolist()
-                        else:
-                            obs_rf = [0] * len(observed_dates)
-                    except Exception as df_err:
-                        st.error(f"❌ ဒေတာဖတ်ရာတွင် အခက်အခဲရှိပါသည်- {df_err}")
-                        
-                if observed_dates and obs_wl:
-                    extended_forecast_dates = [observed_dates[-1]] + forecast_dates
-                    extended_forecast_wl = [obs_wl[-1]] + f_wl_vals
-                else:
-                    extended_forecast_dates = forecast_dates
-                    extended_forecast_wl = f_wl_vals
+        with col_btn:
+            st.write("") # Vertical spacing အတွက်
+            st.write("")
+            btn_clicked = st.button("📊 Show Forecast Graph", type="primary", key="btn_trigger_plotly_final_fixed", use_container_width=True)
+        
+        # 💡 Button နှိပ်ခဲ့လျှင် သို့မဟုတ် ရွေးချယ်ပြီးသားဖြစ်ပါက Graph တန်းပြရန် Session State ထိန်းခြင်း
+        if btn_clicked:
+            st.session_state['active_graph_station'] = graph_station_selector
+
+        st_name = st.session_state.get('active_graph_station', list(stations_list)[0])
+
+        if st_name in st.session_state.GLOBAL_GRAPHS_DATA:
+            p_pkg = st.session_state.GLOBAL_GRAPHS_DATA[st_name]
+            
+            forecast_dates = [pd.to_datetime(d).date() for d in p_pkg['f_dates']]
+            f_wl_vals = p_pkg['f_wl']
+            f_rf_vals = p_pkg['f_rf']
+            
+            observed_dates = []
+            obs_wl = []
+            obs_rf = []
+            
+            if 'ts_extended' in st.session_state and st.session_state.ts_extended is not None:
+                try:
+                    df_copy = st.session_state.ts_extended.copy()
+                    df_copy['Parsed_Date'] = pd.to_datetime(df_copy['Date'])
                     
-                all_dates = observed_dates + forecast_dates
-                min_date = min(all_dates) if all_dates else forecast_dates[0]
-                max_date = max(all_dates) if all_dates else forecast_dates[-1]
-                
-                fig = make_subplots(specs=[[{"secondary_y": True}]])
-                
-                if obs_wl:
-                    fig.add_trace(
-                        go.Scatter(
-                            x=observed_dates, y=obs_wl,
-                            mode='lines+markers', name='Past Observed WL',
-                            line=dict(color='#1f77b4', width=3),
-                            marker=dict(size=6)
-                        ),
-                        secondary_y=False
-                    )
+                    base_date_limit = pd.to_datetime(p_pkg['f_dates'][0]) - pd.Timedelta(days=1)
+                    past_filtered_df = df_copy[df_copy['Parsed_Date'] <= base_date_limit].tail(10)
                     
+                    observed_dates = past_filtered_df['Parsed_Date'].dt.date.tolist()
+                    
+                    wl_col = f'{st_name}_WL'
+                    rf_col = f'{st_name}_RF'
+                    
+                    if wl_col in past_filtered_df.columns:
+                        obs_wl = past_filtered_df[wl_col].values.tolist()
+                    if rf_col in past_filtered_df.columns:
+                        obs_rf = past_filtered_df[rf_col].values.tolist()
+                    else:
+                        obs_rf = [0] * len(observed_dates)
+                except Exception as df_err:
+                    st.error(f"❌ ဒေတာဖတ်ရာတွင် အခက်အခဲရှိပါသည်- {df_err}")
+                
+            if observed_dates and obs_wl:
+                extended_forecast_dates = [observed_dates[-1]] + forecast_dates
+                extended_forecast_wl = [obs_wl[-1]] + f_wl_vals
+            else:
+                extended_forecast_dates = forecast_dates
+                extended_forecast_wl = f_wl_vals
+                
+            all_dates = observed_dates + forecast_dates
+            min_date = min(all_dates) if all_dates else forecast_dates[0]
+            max_date = max(all_dates) if all_dates else forecast_dates[-1]
+            
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            
+            if obs_wl:
                 fig.add_trace(
                     go.Scatter(
-                        x=extended_forecast_dates, y=extended_forecast_wl,
-                        mode='lines+markers', name='AI Forecast WL',
-                        line=dict(color='red', width=3, dash='dash'),
-                        marker=dict(size=6, symbol='square')
+                        x=observed_dates, y=obs_wl,
+                        mode='lines+markers', name='Past Observed WL',
+                        line=dict(color='#1f77b4', width=2.5),
+                        marker=dict(size=5)
                     ),
                     secondary_y=False
                 )
                 
-                danger_val = p_pkg.get('danger_level', 1200)
-                fig.add_trace(
-                    go.Scatter(
-                        x=[min_date, max_date], y=[danger_val]*2,
-                        mode='lines', name=f"Danger Level ({danger_val} cm)",
-                        line=dict(color='darkred', width=2, dash='dot')
-                    ),
-                    secondary_y=False
-                )
-                
-                if obs_rf:
-                    fig.add_trace(
-                        go.Bar(
-                            x=observed_dates, y=obs_rf,
-                            name='Observed RF (mm)',
-                            marker_color='#4A90E2', opacity=0.4
-                        ),
-                        secondary_y=True
-                    )
-                    
+            fig.add_trace(
+                go.Scatter(
+                    x=extended_forecast_dates, y=extended_forecast_wl,
+                    mode='lines+markers', name='AI Forecast WL',
+                    line=dict(color='red', width=2.5, dash='dash'),
+                    marker=dict(size=5, symbol='square')
+                ),
+                secondary_y=False
+            )
+            
+            danger_val = p_pkg.get('danger_level', 1200)
+            fig.add_trace(
+                go.Scatter(
+                    x=[min_date, max_date], y=[danger_val]*2,
+                    mode='lines', name=f"Danger Level ({danger_val} cm)",
+                    line=dict(color='darkred', width=2, dash='dot')
+                ),
+                secondary_y=False
+            )
+            
+            if obs_rf:
                 fig.add_trace(
                     go.Bar(
-                        x=forecast_dates, y=f_rf_vals,
-                        name='Forecast RF (mm)',
-                        marker_color='#9B5DE5', opacity=0.5
+                        x=observed_dates, y=obs_rf,
+                        name='Observed RF (mm)',
+                        marker_color='#4A90E2', opacity=0.4
                     ),
                     secondary_y=True
                 )
                 
-                fig.update_layout(
-                    title=dict(text=f"<b>📊 Hydrograph & Rainfall Trend: {st_name}</b>", x=0.5),
-                    xaxis=dict(
-                        type='date',
-                        tickformat='%Y-%m-%d',
-                        tickangle=-45,
-                        dtick=86400000,
-                        gridcolor='rgba(128,128,128,0.15)'
-                    ),
-                    yaxis=dict(
-                        title="Water Level (cm)", 
-                        side="left", 
-                        showgrid=True, 
-                        gridcolor='rgba(128,128,128,0.15)'
-                    ),
-                    yaxis2=dict(
-                        title="Rainfall (mm)",
-                        side="right",
-                        overlaying="y",
-                        showgrid=False,
-                        autorange="reversed"  # မိုးရေချိန်တိုင်များကို အပေါ်မှအောက်သို့ ပြရန်
-                    ),
-                    legend=dict(
-                        orientation="h",
-                        yanchor="bottom",
-                        y=1.02,
-                        xanchor="right",
-                        x=1
-                    ),
-                    hovermode="x unified",
-                    height=600
-                )
-                
-                # 🚀 Streamlit ပေါ်တွင် Graph ပြသခြင်း
-                st.plotly_chart(fig, use_container_width=True)
-                
-            else:
-                st.error(f"❌ {st_name} စခန်းအတွက် Forecast Graph ဒေတာ မတွေ့ရှိရပါ။")
+            fig.add_trace(
+                go.Bar(
+                    x=forecast_dates, y=f_rf_vals,
+                    name='Forecast RF (mm)',
+                    marker_color='#9B5DE5', opacity=0.5
+                ),
+                secondary_y=True
+            )
+            
+            # 💡 3. Layout Margin နှင့် Height ကို မလိုအပ်ဘဲ အောက်မဆွဲရအောင် 420px သို့ ညှိထားခြင်း
+            fig.update_layout(
+                title=dict(text=f"<b>📊 Hydrograph & Rainfall Trend: {st_name}</b>", x=0.5, font=dict(size=14)),
+                margin=dict(l=10, r=10, t=35, b=10), # Margin ပိုလျှော့လိုက်ပါသည်
+                xaxis=dict(
+                    type='date',
+                    tickformat='%Y-%m-%d',
+                    tickangle=-30,
+                    dtick=86400000,
+                    gridcolor='rgba(128,128,128,0.15)'
+                ),
+                yaxis=dict(
+                    title="Water Level (cm)", 
+                    side="left", 
+                    showgrid=True, 
+                    gridcolor='rgba(128,128,128,0.15)'
+                ),
+                yaxis2=dict(
+                    title="Rainfall (mm)",
+                    side="right",
+                    overlaying="y",
+                    showgrid=False,
+                    autorange="reversed"  
+                ),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1
+                ),
+                hovermode="x unified",
+                height=420 # 👈 height ကို 600 မှ 420px သို့ လျှော့ချလိုက်သည်
+            )
+            
+            # 🚀 Streamlit ပေါ်တွင် Graph ပြသခြင်း
+            st.plotly_chart(fig, use_container_width=True)
+            
+        else:
+            st.error(f"❌ {st_name} စခန်းအတွက် Forecast Graph ဒေတာ မတွေ့ရှိရပါ။")
