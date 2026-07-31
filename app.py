@@ -208,13 +208,12 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
     return [0.0] * days_to_get
 
 # ==============================================================================
-# 🎨 UI TITLE SYSTEM & COMPACT CSS STYLING (FOR ZERO-SCROLL VIEWPORT)
+# 🎨 UI TITLE SYSTEM & COMPACT CSS STYLING (FIXED SPACING & LINE HEIGHT)
 # ==============================================================================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
     
-    /* Font နှင့် Global Space များကို ကျုံ့လိုက်ခြင်း */
     [data-testid="stMainBlockContainer"] p, 
     [data-testid="stMainBlockContainer"] h1, 
     [data-testid="stMainBlockContainer"] h2, 
@@ -225,7 +224,6 @@ st.markdown("""
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
     }
     
-    /* Screen Top/Bottom Padding ကို အလွန်နည်းအောင် ချုံ့ခြင်း */
     [data-testid="stMainBlockContainer"] {
         max-width: 98% !important;
         padding-top: 0.2rem !important;
@@ -235,13 +233,11 @@ st.markdown("""
         margin: 0 auto !important;
     }
     
-    /* Upper Space & Streamlit Header ဖျောက်/ကျုံ့ခြင်း */
     header[data-testid="stHeader"] {
         background-color: rgba(0,0,0,0) !important;
         height: 0rem !important;
     }
     
-    /* Tabs Padding & Font နည်းနည်း သေးလိုက်ခြင်း */
     div[data-testid="stTabs"] button [data-testid="stMarkdownContainer"] p,
     div[data-testid="stTabs"] button p,
     .stTabs [role="tab"] p,
@@ -254,7 +250,6 @@ st.markdown("""
         padding-bottom: 0px !important;
     }
     
-    /* Widget Labels များ အရွယ်အစား လျှော့ခြင်း */
     label[data-testid="stWidgetLabel"] p {
         font-size: 14px !important;
         font-weight: bold !important;
@@ -267,28 +262,28 @@ st.markdown("""
         height: 38px !important;
     }
     
-    /* Header Text Size & Margin အလွန်ကပ်အောင် လုပ်ခြင်း */
+    /* 💡 စာကြောင်း ၂ ခုကြား နေရာခွာခြင်း နှင့် အောက်မျဉ်းနှင့် ပိုကပ်စေခြင်း */
     .dept-title {
         color: #0b6623;
         font-size: 20px;
         font-weight: bold;
-        line-height: 1.1;
-        margin-bottom: 2px;
+        line-height: 1.4;       /* စာကြောင်းနှစ်ခု မထပ်အောင် လေဝင်လေထွက် ပေးထားပါသည် */
+        margin-bottom: 4px;     /* အောက်စာကြောင်းနှင့် နည်းနည်းလေး ခွာပေးထားပါသည် */
     }
     .dash-title {
         color: #1e5494;
         font-size: 15px;
         font-weight: bold;
-        line-height: 1.1;
+        line-height: 1.3;
+        margin-bottom: 0px;
     }
     
-    /* Line & Section Divider Margin ချုံ့ခြင်း */
+    /* 💡 အောက်မျဉ်း (Divider Margin) ကို အထက်ဘက်သို့ ကပ်လိုက်ခြင်း */
     hr {
-        margin-top: 4px !important;
+        margin-top: 2px !important;   /* Header နှင့် Horizontal Line ကြား အကွာအဝေးကို နီးနီးကပ်ကပ် ပြုလုပ်ပေးထားပါသည် */
         margin-bottom: 8px !important;
     }
     
-    /* Table Height အဆင်ပြေအောင် ချိန်ညှိခြင်း */
     div[data-testid="stDataFrame"] {
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
         margin-top: 0px !important;
@@ -298,20 +293,11 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    /* Element Spacing အကွာအဝေးကျုံ့ခြင်း */
     [data-testid="stVerticalBlock"] > div {
         gap: 0.3rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
-
-# Logo ဖိုင် ရှာဖွေခြင်း
-logo_file_candidates = ['DMH Logo.png', 'DMH_Logo.png', 'dmh_logo.png', 'logo.png']
-found_logo = None
-for l_name in logo_file_candidates:
-    if os.path.exists(l_name):
-        found_logo = l_name
-        break
 
 # Compact Top Header Section
 head_col1, head_col2 = st.columns([0.8, 9.2])
