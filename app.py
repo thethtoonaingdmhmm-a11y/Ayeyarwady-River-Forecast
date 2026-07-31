@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import joblib
 import streamlit as st
 import time
-import gspreadfrom google.oauth2.service_account import Credentials
+import gspread from google.oauth2.service_account import Credentials
 from tensorflow.keras.models import load_model
 
 # ==============================================================================
