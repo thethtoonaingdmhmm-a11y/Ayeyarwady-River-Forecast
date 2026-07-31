@@ -210,14 +210,18 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
 # ==============================================================================
 # 🎨 UI TITLE SYSTEM & CSS STYLING
 # ==============================================================================
+import os
 import base64
+
 logo_path = 'DMH Logo.png'
 logo_base64 = ""
 if os.path.exists(logo_path):
     with open(logo_path, "rb") as img_file:
         logo_base64 = base64.b64encode(img_file.read()).decode()
 
-style_css = """<style>
+# CSS Styling (Clean Format)
+st.markdown("""
+<style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
     
     [data-testid="stMainBlockContainer"] p, 
@@ -278,8 +282,8 @@ style_css = """<style>
         text-align: left !important;
         justify-content: flex-start !important;
     }
-</style>"""
-st.markdown(style_css, unsafe_allow_html=True)
+</style>
+""", unsafe_allow_html=True)
 
 # Logo HTML ပြင်ဆင်ခြင်း
 logo_html = f"<div style='flex-shrink: 0; display: flex; align-items: center;'><img src='data:image/png;base64,{logo_base64}' width='125'></div>" if logo_base64 else ""
