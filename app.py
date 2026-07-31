@@ -299,6 +299,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Logo ဖိုင် ရှာဖွေခြင်း
+logo_file_candidates = ['DMH Logo.png', 'DMH_Logo.png', 'dmh_logo.png', 'logo.png']
+found_logo = None
+for l_name in logo_file_candidates:
+    if os.path.exists(l_name):
+        found_logo = l_name
+        break
+        
 # Compact Top Header Section
 head_col1, head_col2 = st.columns([0.8, 9.2])
 
