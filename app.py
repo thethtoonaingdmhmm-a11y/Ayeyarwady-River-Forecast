@@ -666,7 +666,7 @@ with tab3:
             # 💡 3. Layout Margin နှင့် Height ကို မလိုအပ်ဘဲ အောက်မဆွဲရအောင် 420px သို့ ညှိထားခြင်း
             fig.update_layout(
     title=dict(
-        text=f"<b>📊 Hydrograph & Rainfall Trend: {st_name}</b>", 
+        text=f"<b>📊 Hydrograph, Rainfall Trend & Forecast: {st_name}</b>", 
         x=0.5, 
         y=0.98,          # 👈 Title ကို အပေါ်သို့ ပိုမြှင့်လိုက်သည်
         font=dict(size=12) # 👈 Title Font size ကို သေးလိုက်သည်
