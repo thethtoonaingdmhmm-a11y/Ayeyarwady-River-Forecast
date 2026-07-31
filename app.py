@@ -264,17 +264,17 @@ st.markdown("""
         height: 34px !important;
     }
     
-    /* Header Titles */
+    /* 💡 1. Header Titles Font Size များကို ပိုကြီးပေးလိုက်ပါသည် */
     .dept-title {
         color: #0b6623;
-        font-size: 19px;
+        font-size: 26px !important; /* 👈 19px မှ 26px သို့ ကြီးပေးထားသည် */
         font-weight: bold;
         line-height: 1.3;
         margin-bottom: 2px;
     }
     .dash-title {
         color: #1e5494;
-        font-size: 14px;
+        font-size: 18px !important; /* 👈 14px မှ 18px သို့ ကြီးပေးထားသည် */
         font-weight: bold;
         line-height: 1.2;
         margin-bottom: 0px;
@@ -317,12 +317,12 @@ for l_name in logo_file_candidates:
         found_logo = l_name
         break
         
-# Compact Top Header Section
-head_col1, head_col2 = st.columns([0.8, 9.2])
+# 💡 2. Logo နှင့် Header Column Ratio ကို ခေါင်းစဉ်ကြီးသည်နှင့်အမျှ ကွက်တိဖြစ်အောင် ချိန်ပေးထားပါသည်
+head_col1, head_col2 = st.columns([1, 9])
 
 with head_col1:
     if found_logo:
-        st.image(found_logo, width=65)
+        st.image(found_logo, width=80) # 👈 Logo Width ကိုပါ 80px သို့ မျှအောင် ကြီးပေးထားသည်
 
 with head_col2:
     st.markdown("<div class='dept-title'>မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန</div>", unsafe_allow_html=True)
