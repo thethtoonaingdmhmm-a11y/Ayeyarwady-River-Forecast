@@ -336,57 +336,60 @@ st.markdown("<hr style='border: 0; height: 1px; background: #e0e0e0;'>", unsafe_
 tab1, tab2, tab3 = st.tabs(["ဒေတာအသစ်တင်ရန်(CSV)", "ခန့်မှန်းချက်တွက်ရန်", "Graph များကြည့်ရန်"])
 
 # ==============================================================================
-# 📁 TAB 1: CSV BULK UPLOAD PANEL
+# 📂 TAB 1: CSV DATA UPLOAD PANEL (PASSWORD PROTECTED)
 # ==============================================================================
 with tab1:
-    st.markdown("##### 📁 CSV File Bulk Upload")
-    st.caption("✨ **စခန်းအားလုံး၏ နေ့စဉ်ဒေတာပါဝင်သော CSV ဖိုင်ကို တင်လိုက်လျှင် Google Sheet သို့ပါ တိုက်ရိုက် Update ရောက်သွားမည်ဖြစ်သည်**")
+    st.markdown("### 📂 CSV File Bulk Upload (Admin Access)")
     
-    if st.session_state.ts_extended is not None:
-        df_now = st.session_state.ts_extended.copy()
-    else:
-        df_now = pd.DataFrame()
-
-    if 'last_uploaded_file' not in st.session_state:
-        st.session_state.last_uploaded_file = None
-
-    uploaded_file = st.file_uploader("ကျေးဇူးပြု၍ ဒေတာဖိုင် (CSV) ကို ရွေးချယ်တင်ပေးပါ-", type=['csv'])
+    # 🔐 Secret Password သတ်မှတ်ခြင်း (ဒီနေရာမှာ မိမိကြိုက်နှစ်သက်ရာ Password ပြောင်းနိုင်ပါသည်)
+    ADMIN_PASSWORD = "Zala@NPT"  # 👈 မိမိထားချင်သည့် Password ကို ဒီမှာ ပြောင်းပါ (ဥပမာ- "dmh2026", "1234")
     
-    if uploaded_file is not None:
-        if st.session_state.last_uploaded_file != uploaded_file.name:
-            st.session_state.upload_done = False
-            st.session_state.last_uploaded_file = uploaded_file.name
+    # Session State တွင် Login Status ကို မှတ်ထားခြင်း
+    if 'upload_authenticated' not in st.session_state:
+        st.session_state.upload_authenticated = False
 
-        if not st.session_state.upload_done:
-            try:
-                uploaded_df = pd.read_csv(uploaded_file)
-                
-                if 'Date' not in uploaded_df.columns:
-                    st.error("❌ ဖိုင်ထဲတွင် 'Date' Column အတိအကျ မပါဝင်ပါ။")
+    # 🔑 Password မရိုက်ရသေးပါက Password တောင်းသည့် Box ကို ပြသမည်
+    if not st.session_state.upload_authenticated:
+        st.info("🔒 ဒေတာ မမှားယွင်းစေရန်အတွက် CSV File တင်ခြင်းကို Password ဖြင့် ထိန်းချုပ်ထားပါသည်။")
+        
+        pwd_col1, pwd_col2 = st.columns([3, 1])
+        with pwd_col1:
+            input_pwd = st.text_input("🔑 Admin Password ရိုက်ထည့်ပါ-", type="password", key="tab1_pwd_input")
+        with pwd_col2:
+            st.write("")
+            st.write("")
+            if st.button("🔓 Unlock", type="primary", use_container_width=True):
+                if input_pwd == ADMIN_PASSWORD:
+                    st.session_state.upload_authenticated = True
+                    st.success("✅ Password မှန်ကန်ပါသည်။")
+                    st.rerun()
                 else:
-                    try:
-                        uploaded_df['Date'] = pd.to_datetime(uploaded_df['Date'], format='mixed', errors='coerce')
-                        uploaded_df = uploaded_df.dropna(subset=['Date'])
-                        
-                        if not df_now.empty and 'Date' in df_now.columns:
-                            df_now['Date'] = pd.to_datetime(df_now['Date'], dayfirst=True, errors='coerce')
-                            df_now = df_now.dropna(subset=['Date'])
-                            
-                            df_old = df_now[~df_now['Date'].isin(uploaded_df['Date'])].copy()
-                            updated_master = pd.concat([df_old, uploaded_df], ignore_index=True)
-                        else:
-                            updated_master = uploaded_df.copy()
-                        
-                        updated_master = updated_master.sort_values('Date').reset_index(drop=True)
-                        save_data_to_sheets_and_cloud(updated_master)
-                        
-                    except Exception as inner_err:
-                        st.error(f"❌ နောက်ကွယ်မှ ဒေတာများကို ပေါင်းစပ်ရာတွင် အဆင်မပြေပါ (Data Type Error) - {inner_err}")
-                            
+                    st.error("❌ Password မှားယွင်းနေပါသည်။")
+    
+    # 🔓 Password မှန်သွားပါက CSV File Upload တင်သည့် မူရင်း UI ပေါ်လာမည်
+    else:
+        # Logout / Lock ပြန်လုပ်ချင်ပါက နှိပ်ရန် Button
+        top_col1, top_col2 = st.columns([5, 1])
+        with top_col2:
+            if st.button("🔒 Lock Upload", type="secondary", use_container_width=True):
+                st.session_state.upload_authenticated = False
+                st.rerun()
+
+        st.caption("✨ စခန်းအားလုံး၏ နေ့စဉ်ဒေတာပါဝင်သော CSV ဖိုင်ကို တင်လိုက်လျှင် Dashboard ထဲသို့ တိုက်ရိုက် Update ရောက်သွားမည်ဖြစ်သည်")
+        
+        uploaded_file = st.file_uploader("ကျေးဇူးပြု၍ ဒေတာဖိုင် (CSV) ကို ရွေးချယ်တင်ပေးပါ-", type=['csv'], key="tab1_csv_uploader")
+        
+        if uploaded_file is not None:
+            try:
+                # CSV ဖတ်ယူခြင်း
+                df_uploaded = pd.read_csv(uploaded_file)
+                st.session_state.uploaded_df = df_uploaded
+                
+                # Cloud သို့ ပို့ခြင်း / Update လုပ်ခြင်း
+                save_data_to_sheets_and_cloud(df_uploaded)
+                
             except Exception as e:
-                st.error(f"❌ ဒေတာတင်ရာတွင် Error တက်နေပါသည်: {str(e)}")
-        else:
-            st.success("✅ လက်ရှိတင်ထားသော CSV ဖိုင်မှ ဒေတာများကို Cloud ပေါ်သို့ သိမ်းဆည်းပြီးပါပြီဗျာ။")
+                st.error(f"❌ CSV ဖိုင်ဖတ်ရာတွင် အမှားအယွင်းရှိပါသည်- {e}")
 
 # ==============================================================================
 # 🔮 TAB 2: FORECAST SYSTEM ENGINE (COMPACT & COLLAPSIBLE CONTROLS)
