@@ -208,22 +208,16 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
     return [0.0] * days_to_get
 
 # ==============================================================================
-# 🎨 UI TITLE SYSTEM & CSS STYLING (FIXED UI & BASE64 IMPORT)
+# 🎨 UI TITLE SYSTEM & CSS STYLING (FIXED FORMAT)
 # ==============================================================================
-import base64  # <--- base64 library ကို ဤနေရာတွင် မဖြစ်မနေ Import လုပ်ပေးရပါမည်
-
 logo_path = 'DMH Logo.png'
 logo_base64 = ""
-
 if os.path.exists(logo_path):
-    try:
-        with open(logo_path, "rb") as img_file:
-            logo_base64 = base64.b64encode(img_file.read()).decode()
-    except Exception:
-        logo_base64 = ""
+    with open(logo_path, "rb") as img_file:
+        logo_base64 = base64.b64encode(img_file.read()).decode()
 
-# CSS Styling (Clean Single-line Markdown String format to prevent raw code rendering)
-css_code = """
+# CSS Styling (Clean Format to prevent raw text display)
+st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
     
@@ -270,7 +264,6 @@ css_code = """
     div[data-baseweb="input"] input, div[data-baseweb="select"] * {
         font-size: 18px !important;
     }
-    
     div[data-testid="stDataFrame"] {
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
     }
@@ -278,17 +271,42 @@ css_code = """
     div[data-testid="stDataFrame"] * {
         font-size: 18px !important;
     }
+    
+    div[data-testid="stDataFrame"] [role="gridcell"],
+    div[data-testid="stDataFrame"] [role="columnheader"],
+    div[data-testid="stDataFrame"] td,
+    div[data-testid="stDataFrame"] th {
+        text-align: left !important;
+        justify-content: flex-start !important;
+    }
 </style>
-"""
-st.markdown(css_code, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Header HTML (Indentation ပြဿနာမရှိစေရန် တစ်ကြောင်းတည်းပေါင်း၍ ရေးသားထားပါသည်)
-logo_html = f"<img src='data:image/png;base64,{logo_base64}' width='125'>" if logo_base64 else ""
+# Logo HTML ပြင်ဆင်ခြင်း
+logo_html = f"<div style='flex-shrink: 0; display: flex; align-items: center;'><img src='data:image/png;base64,{logo_base64}' width='125'></div>" if logo_base64 else ""
 
-header_html = f"<div style='display: flex; align-items: center; gap: 20px; width: 100%; margin-bottom: 15px;'>{logo_html}<div><h1 style='color: #0b6623 !important; font-size: 28px !important; font-weight: bold !important; margin: 0;'>မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန</h1><h2 style='color: #1e5494 !important; font-size: 19px !important; font-weight: bold !important; margin: 5px 0 0 0;'>DMH AI Flood Dashboard (Ayeyarwady River)</h2></div></div><hr style='border: 0; height: 1px; background: #e0e0e0; margin-bottom: 20px;'>"
+# Header UI HTML ပြင်ဆင်ခြင်း
+ui_html = f"""<div style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; margin-bottom: 20px; padding: 10px 0;">
+    {logo_html}
+    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+        <h1 style="color: #0b6623 !important; font-size: 28px !important; font-weight: bold !important; margin: 0 0 4px 0 !important; padding: 0 !important; line-height: 1.2;">
+            မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန
+        </h1>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <h2 style="color: #1e5494 !important; font-size: 19px !important; font-weight: bold !important; margin: 0 !important; padding: 0 !important; line-height: 1.2;">
+                DMH AI Flood Dashboard (Ayeyarwady River)
+            </h2>
+        </div>
+    </div>
+</div><hr style="border: 0; height: 1px; background: #e0e0e0; margin-bottom: 20px;">"""
 
-# HTML အဖြစ် Rendering လုပ်ခြင်း
-st.markdown(header_html, unsafe_allow_html=True)
+st.markdown(ui_html, unsafe_allow_html=True)
+
+if 'GLOBAL_GRAPHS_DATA' not in st.session_state:
+    st.session_state.GLOBAL_GRAPHS_DATA = {}
+
+if 'summary_results' not in st.session_state:
+    st.session_state.summary_results = []
 
 # ==============================================================================
 # 🗂️ TAB DEFINITION
