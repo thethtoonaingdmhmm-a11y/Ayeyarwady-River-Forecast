@@ -2,11 +2,9 @@ streamlit
 pandas
 numpy
 matplotlib
-tensorflow
 scikit-learn
 joblib
 requests
 gspread
-gspread-dataframe
+google-auth
 plotly
-oauth2client
