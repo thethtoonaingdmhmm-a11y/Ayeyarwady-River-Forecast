@@ -208,18 +208,15 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
     return [0.0] * days_to_get
 
 # ==============================================================================
-# 🎨 UI TITLE SYSTEM & CSS STYLING
+# 🎨 UI TITLE SYSTEM & CSS STYLING (FIXED FORMAT)
 # ==============================================================================
-import os
-import base64
-
 logo_path = 'DMH Logo.png'
 logo_base64 = ""
 if os.path.exists(logo_path):
     with open(logo_path, "rb") as img_file:
         logo_base64 = base64.b64encode(img_file.read()).decode()
 
-# CSS Styling (Clean Format)
+# CSS Styling (Clean Format to prevent raw text display)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
