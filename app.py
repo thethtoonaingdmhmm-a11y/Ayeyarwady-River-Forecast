@@ -12,7 +12,7 @@ import streamlit as st
 import time
 import json
 import gspread 
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 from tensorflow.keras.models import load_model
 
 # ==============================================================================
@@ -121,16 +121,16 @@ def save_data_to_sheets_and_cloud(df):
         df_to_save['Date'] = pd.to_datetime(df_to_save['Date']).dt.strftime('%Y-%m-%d')
         df_to_save.to_csv(csv_path, index=False)
         
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+       scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
         creds = None
         
         # 💡 1. Streamlit Cloud Secrets စစ်ဆေးခြင်း
         if "gcp_service_account" in st.secrets:
             creds_dict = dict(st.secrets["gcp_service_account"])
-            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+            creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
         # 💡 2. Local google_creds.json ဖိုင် စစ်ဆေးခြင်း
         elif os.path.exists(creds_json_path):
-            creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json_path, scope)
+            creds = Credentials.from_service_account_file(creds_json_path, scopes=scope)
             
         if creds is not None:
             client = gspread.authorize(creds)
