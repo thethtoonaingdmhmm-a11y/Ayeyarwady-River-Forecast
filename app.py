@@ -541,7 +541,7 @@ with tab2:
 # ==============================================================================
 with tab3:
     # 💡 1. Heading စာလုံး အရွယ်အစားကို compact ဖြစ်အောင် အသေးပြောင်းခြင်း
-    st.markdown("### 📈 Interactive Forecast Hydrograph & Rainfall")
+    st.markdown("<h5 style='margin-bottom: 0px;'>📈 Interactive Forecast Hydrograph & Rainfall</h5>", unsafe_allow_html=True)
     
     if not st.session_state.get('GLOBAL_GRAPHS_DATA'):
         st.warning("⚠️ ကျေးဇူးပြု၍ '🔮 ခန့်မှန်းချက်တွက်ရန်' Tab တွင် Run Forecast Engine ကို အရင်နှိပ်ပေးပါရန်။")
@@ -665,38 +665,44 @@ with tab3:
             
             # 💡 3. Layout Margin နှင့် Height ကို မလိုအပ်ဘဲ အောက်မဆွဲရအောင် 420px သို့ ညှိထားခြင်း
             fig.update_layout(
-                title=dict(text=f"<b>📊 Hydrograph & Rainfall Trend: {st_name}</b>", x=0.5, font=dict(size=14)),
-                margin=dict(l=10, r=10, t=35, b=10), # Margin ပိုလျှော့လိုက်ပါသည်
-                xaxis=dict(
-                    type='date',
-                    tickformat='%Y-%m-%d',
-                    tickangle=-30,
-                    dtick=86400000,
-                    gridcolor='rgba(128,128,128,0.15)'
-                ),
-                yaxis=dict(
-                    title="Water Level (cm)", 
-                    side="left", 
-                    showgrid=True, 
-                    gridcolor='rgba(128,128,128,0.15)'
-                ),
-                yaxis2=dict(
-                    title="Rainfall (mm)",
-                    side="right",
-                    overlaying="y",
-                    showgrid=False,
-                    autorange="reversed"  
-                ),
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=1.02,
-                    xanchor="right",
-                    x=1
-                ),
-                hovermode="x unified",
-                height=420 # 👈 height ကို 600 မှ 420px သို့ လျှော့ချလိုက်သည်
-            )
+    title=dict(
+        text=f"<b>📊 Hydrograph & Rainfall Trend: {st_name}</b>", 
+        x=0.5, 
+        y=0.98,          # 👈 Title ကို အပေါ်သို့ ပိုမြှင့်လိုက်သည်
+        font=dict(size=12) # 👈 Title Font size ကို သေးလိုက်သည်
+    ),
+    margin=dict(l=10, r=10, t=50, b=10), # 👈 Top Margin ကို 50px ပေးပြီး Space ချပေးထားသည်
+    xaxis=dict(
+        type='date',
+        tickformat='%Y-%m-%d',
+        tickangle=-30,
+        dtick=86400000,
+        gridcolor='rgba(128,128,128,0.15)'
+    ),
+    yaxis=dict(
+        title="Water Level (cm)", 
+        side="left", 
+        showgrid=True, 
+        gridcolor='rgba(128,128,128,0.15)'
+    ),
+    yaxis2=dict(
+        title="Rainfall (mm)",
+        side="right",
+        overlaying="y",
+        showgrid=False,
+        autorange="reversed"  
+    ),
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.0,           # 👈 Legend ကို Title အောက်နားတွင် ကွက်တိ ကျစေရန် ညှိထားသည်
+        xanchor="right",
+        x=1,
+        font=dict(size=10)
+    ),
+    hovermode="x unified",
+    height=400 # 👈 Viewport ထဲ ကွက်တိဝင်အောင် Height 400px ထားပေးထားပါသည်
+)
             
             # 🚀 Streamlit ပေါ်တွင် Graph ပြသခြင်း
             st.plotly_chart(fig, use_container_width=True)
