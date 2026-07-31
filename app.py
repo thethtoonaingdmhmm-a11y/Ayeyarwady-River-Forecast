@@ -10,8 +10,9 @@ import matplotlib.pyplot as plt
 import joblib
 import streamlit as st
 import time
+import json
 import gspread 
-from google.oauth2.service_account import Credentials
+from oauth2client.service_account import ServiceAccountCredentials
 from tensorflow.keras.models import load_model
 
 # ==============================================================================
@@ -53,7 +54,7 @@ if not os.path.exists(meta_path) and os.path.exists('station_Meta.csv'):
 if not os.path.exists(csv_path) and os.path.exists('station_Data.csv'): 
     csv_path = 'station_Data.csv'
 
-# 💡 [GLOBAL DATA LOAD] Tab 2 တွင် တိုင်မပတ်စေရန် မက်တာဒေတာကို ကြိုတင်ဖတ်ထားခြင်း
+# 💡 [GLOBAL DATA LOAD] မက်တာဒေတာကို ကြိုတင်ဖတ်ထားခြင်း
 if os.path.exists(meta_path):
     meta_df = pd.read_csv(meta_path)
 else:
@@ -67,12 +68,10 @@ stations_list = [
 ]
 
 # ==============================================================================
-# 🌐 LOCAL & UPLOADED CSV DATA LOADER (GOOGLE SHEETS BYPASSED)
+# 🌐 DATA LOADER & AUTO-SYNC FUNCTIONS (STREAMLIT SECRETS SUPPORTED)
 # ==============================================================================
 def load_data_from_sheets(url=None):
-    # Google Sheet ကို မသွားတော့ဘဲ ဆရာကြီး တင်ထားတဲ့ Uploaded Data သို့မဟုတ် Local CSV ကိုပဲ တိုက်ရိုက်ဖတ်စေခြင်း
     try:
-        # 1. သုံးစွဲသူ တင်ထားတဲ့ ဒေတာ ရှိမရှိ စစ်ဆေးခြင်း
         if 'uploaded_df' in st.session_state and st.session_state.uploaded_df is not None:
             df = st.session_state.uploaded_df.copy()
         elif os.path.exists(csv_path):
@@ -80,16 +79,14 @@ def load_data_from_sheets(url=None):
         else:
             return None
             
-        # 2. ရက်စွဲ Format ကို DD/MM/YYYY ပုံစံဖြင့် ကွက်တိ Parse လုပ်ခြင်း
-        df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y', dayfirst=True, errors='coerce')
+        # 💡 ရက်စွဲ Format မှားယူမှု မဖြစ်အောင် format='mixed' အသုံးပြုထားပါသည်
+        df['Date'] = pd.to_datetime(df['Date'], format='mixed', errors='coerce')
         df = df.dropna(subset=['Date'])
 
-        # 3. တန်ဖိုးများကို Numeric ပြောင်းလဲခြင်း
         for col in df.columns:
             if col != 'Date':
                 df[col] = pd.to_numeric(df[col], errors='coerce')
 
-        # 4. နောက်ဆုံးရက်စွဲမှ နောက်ကြောင်းပြန် ရက်ပေါင်း ၉၀ စာကို ယူခြင်း
         if not df.empty:
             max_live_date = df['Date'].max()
             cutoff_live_date = max_live_date - pd.Timedelta(days=90)
@@ -103,17 +100,15 @@ def load_data_from_sheets(url=None):
 
 def fetch_and_sync_google_sheet():
     df = load_data_from_sheets()
-    if df is not None:
-        if not df.empty:
-            # Base Date ကို ဒေတာထဲက နောက်ဆုံးရက်စွဲ (ဥပမာ- 2026-06-28) ကို အလိုအလျောက် ပေးစေခြင်း
-            st.session_state.base_date = pd.to_datetime(df['Date']).max().date()
+    if df is not None and not df.empty:
+        st.session_state.base_date = pd.to_datetime(df['Date']).max().date()
         return df
     else:
         if 'base_date' not in st.session_state or st.session_state.base_date is None:
             st.session_state.base_date = datetime.date.today()
         if os.path.exists(csv_path):
             df_local = pd.read_csv(csv_path)
-            df_local['Date'] = pd.to_datetime(df_local['Date'], format='%d/%m/%Y', dayfirst=True, errors='coerce')
+            df_local['Date'] = pd.to_datetime(df_local['Date'], format='mixed', errors='coerce')
             return df_local
         return None
 
@@ -123,41 +118,45 @@ def save_data_to_sheets_and_cloud(df):
         status_placeholder.info("⏳ ဒေတာများကို မူရင်း Google Sheet နှင့်ပေါင်းစပ်ပြီး Cloud ပေါ်သို့ ပို့နေပါသည်...")
         
         df_to_save = df.copy()
-        df_to_save['Date'] = df_to_save['Date'].dt.strftime('%Y-%m-%d')
+        df_to_save['Date'] = pd.to_datetime(df_to_save['Date']).dt.strftime('%Y-%m-%d')
         df_to_save.to_csv(csv_path, index=False)
         
-        if os.path.exists(creds_json_path):
-            try:
-                scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-                creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json_path, scope)
-                client = gspread.authorize(creds)
-                
-                workbook = client.open_by_key(SHEET_ID)
-                worksheet = workbook.get_worksheet(0)
-                worksheet.clear()
-                
-                df_filled = df_to_save.fillna('')
-                data_to_upload = [df_filled.columns.values.tolist()] + df_filled.values.tolist()
-                worksheet.update(data_to_upload)
-                
-                status_placeholder.empty()
-                st.session_state.ts_extended = df
-                st.session_state.upload_done = True
-                
-                st.toast("🎉 Google Sheet Cloud သို့ ဒေတာများ Sync လုပ်ပြီးပါပြီ။", icon="✅")
-                time.sleep(0.5)
-                st.rerun()
-                
-            except Exception as cloud_err:
-                status_placeholder.empty()
-                st.error(f"❌ Google Sheet Cloud ပေါ်သို့ ဒေတာလှမ်းတင်ရာတွင် Error တက်နေပါသည် - {cloud_err}")
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = None
+        
+        # 💡 1. Streamlit Cloud Secrets စစ်ဆေးခြင်း
+        if "gcp_service_account" in st.secrets:
+            creds_dict = dict(st.secrets["gcp_service_account"])
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        # 💡 2. Local google_creds.json ဖိုင် စစ်ဆေးခြင်း
+        elif os.path.exists(creds_json_path):
+            creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json_path, scope)
+            
+        if creds is not None:
+            client = gspread.authorize(creds)
+            workbook = client.open_by_key(SHEET_ID)
+            worksheet = workbook.get_worksheet(0)
+            worksheet.clear()
+            
+            df_filled = df_to_save.fillna('')
+            data_to_upload = [df_filled.columns.values.tolist()] + df_filled.values.tolist()
+            worksheet.update(data_to_upload)
+            
+            status_placeholder.empty()
+            st.session_state.ts_extended = df
+            st.session_state.upload_done = True
+            
+            st.toast("🎉 Google Sheet Cloud သို့ ဒေတာများ Sync လုပ်ပြီးပါပြီ။", icon="✅")
+            time.sleep(0.5)
+            st.rerun()
         else:
             status_placeholder.empty()
-            st.error("❌ 'google_creds.json' ဖိုင်ကို ဤစက်၏ Folder ထဲတွင် မတွေ့ရှိရသေးပါ။")
+            st.session_state.ts_extended = df
+            st.warning("⚠️ Cloud Credentials (Secrets/JSON) မရှိပါသော်လည်း Dashboard ထဲတွင် ဒေတာ အောင်မြင်စွာ Update ဖြစ်သွားပါပြီ။")
             
     except Exception as e:
         status_placeholder.empty()
-        st.error(f"❌ ဒေတာများကို Local တွင် သိမ်းဆည်းရာတွင် အခက်အခဲရှိပါသည် - {e}")
+        st.error(f"❌ Google Sheet သို့ Sync လုပ်ရာတွင် အဆင်မပြေပါ - {e}")
 
 if 'ts_extended' not in st.session_state or st.session_state.ts_extended is None:
     df_init = load_data_from_sheets(GOOGLE_SHEET_URL)
@@ -165,7 +164,7 @@ if 'ts_extended' not in st.session_state or st.session_state.ts_extended is None
         st.session_state.ts_extended = df_init
     elif os.path.exists(csv_path):
         df = pd.read_csv(csv_path)
-        df['Date'] = pd.to_datetime(df['Date'])
+        df['Date'] = pd.to_datetime(df['Date'], format='mixed', errors='coerce')
         st.session_state.ts_extended = df
     else:
         dates_idx = pd.date_range(end=datetime.date.today(), periods=35)
