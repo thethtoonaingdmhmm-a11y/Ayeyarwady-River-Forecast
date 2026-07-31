@@ -366,7 +366,7 @@ with tab1:
                     st.error("❌ ဖိုင်ထဲတွင် 'Date' Column အတိအကျ မပါဝင်ပါ။")
                 else:
                     try:
-                        uploaded_df['Date'] = pd.to_datetime(uploaded_df['Date'], dayfirst=True, errors='coerce')
+                        uploaded_df['Date'] = pd.to_datetime(uploaded_df['Date'], format='mixed', errors='coerce')
                         uploaded_df = uploaded_df.dropna(subset=['Date'])
                         
                         if not df_now.empty and 'Date' in df_now.columns:
@@ -440,13 +440,16 @@ with tab2:
                     if available_past_data.empty or available_past_data[wl_col].isna().all():
                         available_past_data = ts_df[ts_df[wl_col].notna()].copy()
                     
+                   # 💡 ရက်စွဲ Format ပြဿနာမတက်အောင် ISO Format အဖြစ် သေချာပြောင်းလဲခြင်း
                     current_window_df = available_past_data.tail(30).copy()
                     
                     if not current_window_df.empty:
-                        actual_data_date_str = current_window_df.iloc[-1]['Date'].strftime('%Y-%m-%d')
+                        # ISO Format (YYYY-MM-DD) အဖြစ် အတိအကျပြောင်းယူခြင်း
+                        last_dt_val = pd.to_datetime(current_window_df.iloc[-1]['Date'], errors='coerce')
+                        actual_data_date_str = last_dt_val.strftime('%Y-%m-%d') if pd.notna(last_dt_val) else "No Data"
                     else:
                         actual_data_date_str = "No Data"
-                        
+                    
                     dynamic_wl_header = f"📉 Last Obs WL ({actual_data_date_str}) (cm)"
                     
                     for col in base_features:
