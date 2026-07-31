@@ -208,12 +208,13 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
     return [0.0] * days_to_get
 
 # ==============================================================================
-# 🎨 UI TITLE SYSTEM & CSS STYLING (NATIVE STREAMLIT COMPONENT - NO RAW CODE ISSUE)
+# 🎨 UI TITLE SYSTEM & COMPACT CSS STYLING (FOR ZERO-SCROLL VIEWPORT)
 # ==============================================================================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
     
+    /* Font နှင့် Global Space များကို ကျုံ့လိုက်ခြင်း */
     [data-testid="stMainBlockContainer"] p, 
     [data-testid="stMainBlockContainer"] h1, 
     [data-testid="stMainBlockContainer"] h2, 
@@ -224,60 +225,82 @@ st.markdown("""
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
     }
     
+    /* Screen Top/Bottom Padding ကို အလွန်နည်းအောင် ချုံ့ခြင်း */
     [data-testid="stMainBlockContainer"] {
-        max-width: 95% !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 2rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
+        max-width: 98% !important;
+        padding-top: 0.2rem !important;
+        padding-bottom: 0.5rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
         margin: 0 auto !important;
     }
     
+    /* Upper Space & Streamlit Header ဖျောက်/ကျုံ့ခြင်း */
     header[data-testid="stHeader"] {
         background-color: rgba(0,0,0,0) !important;
-        height: 1.5rem !important;
+        height: 0rem !important;
     }
     
+    /* Tabs Padding & Font နည်းနည်း သေးလိုက်ခြင်း */
     div[data-testid="stTabs"] button [data-testid="stMarkdownContainer"] p,
     div[data-testid="stTabs"] button p,
     .stTabs [role="tab"] p,
     button[id^="tabs-bndry"] p {
         font-family: 'Pyidaungsu', sans-serif !important;
-        font-size: 22px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         color: #1e5494 !important;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
     }
     
+    /* Widget Labels များ အရွယ်အစား လျှော့ခြင်း */
     label[data-testid="stWidgetLabel"] p {
-        font-size: 18px !important;
+        font-size: 14px !important;
         font-weight: bold !important;
         color: #1e5494 !important;
+        margin-bottom: 2px !important;
     }
     
     div[data-baseweb="input"] input, div[data-baseweb="select"] * {
-        font-size: 18px !important;
+        font-size: 14px !important;
+        height: 38px !important;
     }
     
-    div[data-testid="stDataFrame"] {
-        font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
-    }
-    
-    div[data-testid="stDataFrame"] * {
-        font-size: 18px !important;
-    }
-    
+    /* Header Text Size & Margin အလွန်ကပ်အောင် လုပ်ခြင်း */
     .dept-title {
         color: #0b6623;
-        font-size: 28px;
+        font-size: 20px;
         font-weight: bold;
-        line-height: 1.2;
-        margin-bottom: 4px;
+        line-height: 1.1;
+        margin-bottom: 2px;
     }
     .dash-title {
         color: #1e5494;
-        font-size: 20px;
+        font-size: 15px;
         font-weight: bold;
-        line-height: 1.2;
+        line-height: 1.1;
+    }
+    
+    /* Line & Section Divider Margin ချုံ့ခြင်း */
+    hr {
+        margin-top: 4px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    /* Table Height အဆင်ပြေအောင် ချိန်ညှိခြင်း */
+    div[data-testid="stDataFrame"] {
+        font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
+        margin-top: 0px !important;
+    }
+    
+    div[data-testid="stDataFrame"] * {
+        font-size: 14px !important;
+    }
+    
+    /* Element Spacing အကွာအဝေးကျုံ့ခြင်း */
+    [data-testid="stVerticalBlock"] > div {
+        gap: 0.3rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -290,18 +313,18 @@ for l_name in logo_file_candidates:
         found_logo = l_name
         break
 
-# Header ပိုင်းကို Streamlit Native Layout ဖြင့် ပုံဖော်ခြင်း (HTML အကွက်ကြီး ရေးမပြတော့ပါ)
-head_col1, head_col2 = st.columns([1, 7])
+# Compact Top Header Section
+head_col1, head_col2 = st.columns([0.8, 9.2])
 
 with head_col1:
     if found_logo:
-        st.image(found_logo, width=110)
+        st.image(found_logo, width=65)
 
 with head_col2:
     st.markdown("<div class='dept-title'>မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန</div>", unsafe_allow_html=True)
     st.markdown("<div class='dash-title'>DMH AI Flood Dashboard (Ayeyarwady River)</div>", unsafe_allow_html=True)
 
-st.divider()
+st.markdown("<hr style='border: 0; height: 1px; background: #e0e0e0;'>", unsafe_allow_html=True)
 
 # ==============================================================================
 # 🗂️ TAB DEFINITION
@@ -312,10 +335,10 @@ tab1, tab2, tab3 = st.tabs(["ဒေတာအသစ်တင်ရန်(CSV)", "
 # 📁 TAB 1: CSV BULK UPLOAD PANEL
 # ==============================================================================
 with tab1:
-    st.subheader("📁 CSV File Bulk Upload")
-    st.write("✨ **စခန်းအားလုံး၏ နေ့စဉ်ဒေတာပါဝင်သော CSV ဖိုင်ကို တင်လိုက်လျှင် Google Sheet သို့ပါ တိုက်ရိုက် Update ရောက်သွားမည်ဖြစ်သည်**")
+    st.markdown("##### 📁 CSV File Bulk Upload")
+    st.caption("✨ **စခန်းအားလုံး၏ နေ့စဉ်ဒေတာပါဝင်သော CSV ဖိုင်ကို တင်လိုက်လျှင် Google Sheet သို့ပါ တိုက်ရိုက် Update ရောက်သွားမည်ဖြစ်သည်**")
     
-    if 'ts_extended' in st.session_state and st.session_state.ts_extended is not None:
+    if st.session_state.ts_extended is not None:
         df_now = st.session_state.ts_extended.copy()
     else:
         df_now = pd.DataFrame()
@@ -323,7 +346,7 @@ with tab1:
     if 'last_uploaded_file' not in st.session_state:
         st.session_state.last_uploaded_file = None
 
-    uploaded_file = st.file_uploader("ကျေးစုပြု၍ ဒေတာဖိုင် (CSV) ကို ရွေးချယ်တင်ပေးပါ-", type=['csv'])
+    uploaded_file = st.file_uploader("ကျေးဇူးပြု၍ ဒေတာဖိုင် (CSV) ကို ရွေးချယ်တင်ပေးပါ-", type=['csv'])
     
     if uploaded_file is not None:
         if st.session_state.last_uploaded_file != uploaded_file.name:
@@ -360,147 +383,152 @@ with tab1:
                 st.error(f"❌ ဒေတာတင်ရာတွင် Error တက်နေပါသည်: {str(e)}")
         else:
             st.success("✅ လက်ရှိတင်ထားသော CSV ဖိုင်မှ ဒေတာများကို Cloud ပေါ်သို့ သိမ်းဆည်းပြီးပါပြီဗျာ။")
-            
+
 # ==============================================================================
-# 🔮 TAB 2: FORECAST SYSTEM ENGINE
+# 🔮 TAB 2: FORECAST SYSTEM ENGINE (COMPACT & COLLAPSIBLE CONTROLS)
 # ==============================================================================
 with tab2:
-    st.subheader("Multi-Station AI Forecasting")
+    # Controls များကို Expander သို့မဟုတ် 1-Row Inline Layout ပြုလုပ်ထားသဖြင့် Space အလွန်သက်သာသည်
+    c_col1, c_col2, c_col3, c_col4 = st.columns([2, 1.5, 2, 2.5])
     
-    if st.button("🔄 Sync Data from Google Sheet", type="secondary"):
-        with st.spinner("Google Sheet မှ ဒေတာအသစ်များကို ရယူနေပါသည်..."):
+    with c_col1:
+        date_forecast = st.date_input("📅 Base Date:", datetime.date.today(), key="fc_dt")
+    with c_col2:
+        lt_forecast = st.selectbox("🔮 Lead Time:", [1, 3], index=1)
+    with c_col3:
+        st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
+        run_btn = st.button("🚀 Run Forecast", type="primary", use_container_width=True)
+    with c_col4:
+        st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
+        sync_btn = st.button("🔄 Sync Sheet", type="secondary", use_container_width=True)
+
+    if sync_btn:
+        with st.spinner("Syncing..."):
             df_sync = load_data_from_sheets(GOOGLE_SHEET_URL)
             if df_sync is not None:
                 st.session_state.ts_extended = df_sync
-                st.success("✅ ဒေတာများကို အောင်မြင်စွာ နောက်ဆုံးပေါ်ဖြစ်အောင် လုပ်ဆောင်ပြီးပါပြီ။")
+                st.toast("✅ Google Sheet ဒေတာ Sync ပြုလုပ်ပြီးပါပြီ။", icon="✅")
                 st.rerun()
 
-    f_col1, f_col2 = st.columns(2)
-    with f_col1:
-        date_forecast = st.date_input("📅 Base Date:", datetime.date.today(), key="fc_dt")
-    with f_col2:
-        lt_forecast = st.selectbox("🔮 Lead Time (Days):", [1, 3], index=1)
-
     base_date = date_forecast.strftime('%Y-%m-%d')
-    last_observed_wl = 400 
 
-    if st.button("🚀 Run Forecast Engine", type="primary"):
+    if run_btn:
         lt_val = int(lt_forecast)
         target_dt = pd.to_datetime(date_forecast)
         ts_df = st.session_state.ts_extended
-        st.info(f"⏳ စခန်းအားလုံး၏ {lt_val}-Day Ahead Forecast ဇယားကို တွက်ချက်နေပါသည်...")
         
-        summary_results = []
-        graphs_store = {}
+        with st.spinner("⏳ AI Forecast တွက်ချက်နေပါသည်..."):
+            summary_results = []
+            graphs_store = {}
 
-        for st_name in stations_list:
-            try:
-                st_info = meta_df[meta_df['Station'] == st_name].iloc[0]
-                danger_level = st_info['Danger Level_cm']
-                wl_col = f'{st_name}_WL'
-                rf_col = f'{st_name}_RF'
-                wd_col = f'{st_name}_Width'
-                el_col = f'{st_name}_Elev'
-                base_features = [wl_col, rf_col, wd_col, el_col]
-                
-                available_past_data = ts_df[ts_df['Date'] <= target_dt].copy()
-                if available_past_data.empty or available_past_data[wl_col].isna().all():
-                    available_past_data = ts_df[ts_df[wl_col].notna()].copy()
-                
-                current_window_df = available_past_data.tail(30).copy()
-                
-                if not current_window_df.empty:
-                    actual_data_date_str = current_window_df.iloc[-1]['Date'].strftime('%Y-%m-%d')
-                else:
-                    actual_data_date_str = "No Data"
+            for st_name in stations_list:
+                try:
+                    st_info = meta_df[meta_df['Station'] == st_name].iloc[0]
+                    danger_level = st_info['Danger Level_cm']
+                    wl_col = f'{st_name}_WL'
+                    rf_col = f'{st_name}_RF'
+                    wd_col = f'{st_name}_Width'
+                    el_col = f'{st_name}_Elev'
+                    base_features = [wl_col, rf_col, wd_col, el_col]
                     
-                dynamic_wl_header = f"📉 Last Obs WL ({actual_data_date_str}) (cm)"
-                
-                for col in base_features:
-                    if col not in current_window_df.columns:
-                        if '_Width' in col: current_window_df[col] = 100.0
-                        elif '_Elev' in col: current_window_df[col] = 10.0
-                        else: current_window_df[col] = 0.0
-                        
-                forecasted_rainfalls = get_weather_forecast_array(st_info['Latitude'], st_info['Longitude'], lt_val, date_forecast)
-                
-                last_obs_wl = current_window_df.iloc[-1][wl_col] if not current_window_df.empty else 400
-                daily_change = last_obs_wl - current_window_df.iloc[-2][wl_col] if len(current_window_df) >= 2 else 0
-                station_f_dates, f_wl, f_rf = [], [], []
-                
-                for i in range(1, lt_val + 1):
-                    curr_f_date = target_dt + pd.Timedelta(days=i)
-                    m_path = f"{base_models_dir}/{st_name}_model_{i}day.h5"
-                    if not os.path.exists(m_path): m_path = f"{base_models_dir}/{st_name}_model_1day.h5"
-                    s_path = f"{base_models_dir}/{st_name}_scaler_1day.pkl"
+                    available_past_data = ts_df[ts_df['Date'] <= target_dt].copy()
+                    if available_past_data.empty or available_past_data[wl_col].isna().all():
+                        available_past_data = ts_df[ts_df[wl_col].notna()].copy()
                     
-                    if os.path.exists(m_path) and os.path.exists(s_path):
-                        m = load_ai_model(m_path)
-                        s = load_scaler(s_path)
-                        n_features = s.n_features_in_ if hasattr(s, 'n_features_in_') else len(s.scale_)
-                        if n_features == 1:
-                            final_input = np.hstack([s.transform(current_window_df[[wl_col]].values), current_window_df[[rf_col, wd_col, el_col]].values])
-                            pred_wl_raw = int(round(s.inverse_transform(m(np.expand_dims(final_input, axis=0), training=False).numpy())[0, 0]))
-                        else:
-                            pred_wl_raw = int(round(m(np.expand_dims(s.transform(current_window_df[base_features].values), axis=0), training=False).numpy()[0, 0] * s.scale_[0] + s.min_[0]))
-                        
-                        pred_wl = int(round(pred_wl_raw))
-                        if pred_wl <= 0 or abs(pred_wl - last_obs_wl) > 500:
-                            pred_wl = int(last_obs_wl + (daily_change * i * 0.3))
+                    current_window_df = available_past_data.tail(30).copy()
+                    
+                    if not current_window_df.empty:
+                        actual_data_date_str = current_window_df.iloc[-1]['Date'].strftime('%Y-%m-%d')
                     else:
-                        pred_wl = int(last_obs_wl + (daily_change * i * 0.3))
+                        actual_data_date_str = "No Data"
                         
-                    station_f_dates.append(curr_f_date)
-                    f_wl.append(pred_wl)
-                    f_rf.append(forecasted_rainfalls[i - 1])
+                    dynamic_wl_header = f"📉 Last Obs WL ({actual_data_date_str}) (cm)"
                     
-                    new_row = current_window_df.iloc[-1].copy()
-                    new_row['Date'] = curr_f_date
-                    new_row[wl_col] = pred_wl
-                    current_window_df = pd.concat([current_window_df.iloc[1:], pd.DataFrame([new_row])])
+                    for col in base_features:
+                        if col not in current_window_df.columns:
+                            if '_Width' in col: current_window_df[col] = 100.0
+                            elif '_Elev' in col: current_window_df[col] = 10.0
+                            else: current_window_df[col] = 0.0
+                            
+                    forecasted_rainfalls = get_weather_forecast_array(st_info['Latitude'], st_info['Longitude'], lt_val, date_forecast)
                     
-                final_pred_wl = f_wl[-1]
-                diff_from_danger = final_pred_wl - danger_level
-                wl_net_change = final_pred_wl - last_obs_wl
-                wl_change_display = f"📈 တက်မည် (+{int(wl_net_change)} cm)" if wl_net_change > 0 else (f"📉 ကျမည် ({int(wl_net_change)} cm)" if wl_net_change < 0 else "⚖️ မပြောင်းလဲပါ")
-                
-                if final_pred_wl >= danger_level:
-                    status = "🚨 ရေကြီးနိုင်"
-                elif diff_from_danger >= -100:
-                    status = "🟡 စောင့်ကြည့်ရန်လို"
-                else:
-                    status = "🟢 စိတ်ချရ"
+                    last_obs_wl = current_window_df.iloc[-1][wl_col] if not current_window_df.empty else 400
+                    daily_change = last_obs_wl - current_window_df.iloc[-2][wl_col] if len(current_window_df) >= 2 else 0
+                    station_f_dates, f_wl, f_rf = [], [], []
                     
-                summary_results.append({
-                    "📍 Station": st_name, 
-                    dynamic_wl_header: int(last_obs_wl), 
-                    "⚠️ 24-hr Change (cm)": f"+{int(daily_change)}" if daily_change > 0 else f"{int(daily_change)}",
-                    "🌧️ Forecast RF (mm)": round(sum(f_rf), 1), 
-                    f"🔮 Forecasted WL ({lt_val}-Day)": final_pred_wl, 
-                    "📈/📉 Forecast WL Change": wl_change_display,
-                    "⚠️ Danger Level (cm)": danger_level, 
-                    "➕/➖ Diff (cm)": f"+{diff_from_danger}" if diff_from_danger >= 0 else f"{diff_from_danger}", 
-                    "📢 Status": status
-                })
-                graphs_store[st_name] = {
-                    'f_dates': station_f_dates, 'f_wl': f_wl, 'f_rf': f_rf, 'danger_level': danger_level,
-                    'recent_df': ts_df[ts_df['Date'] <= target_dt].tail(15).copy(), 'last_obs_wl': last_obs_wl
-                }
-            except Exception as e:
-                st.error(f"❌ Error in {st_name}: {e}")
-                
-        if summary_results:
-            st.session_state.summary_results = summary_results
-            st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
-            st.success("📊 Summary Forecast Table Generated Successfully!")
-            st.dataframe(pd.DataFrame(st.session_state.summary_results), use_container_width=True)
-            st.balloons()
-            
-    elif len(st.session_state.summary_results) > 0:
-        st.markdown("---")
-        st.subheader("📊 လက်ရှိ တွက်ချက်ထားသော Forecast ရလဒ်များ")
-        st.dataframe(pd.DataFrame(st.session_state.summary_results), use_container_width=True)
+                    for i in range(1, lt_val + 1):
+                        curr_f_date = target_dt + pd.Timedelta(days=i)
+                        m_path = f"{base_models_dir}/{st_name}_model_{i}day.h5"
+                        if not os.path.exists(m_path): m_path = f"{base_models_dir}/{st_name}_model_1day.h5"
+                        s_path = f"{base_models_dir}/{st_name}_scaler_1day.pkl"
+                        
+                        if os.path.exists(m_path) and os.path.exists(s_path):
+                            m = load_ai_model(m_path)
+                            s = load_scaler(s_path)
+                            n_features = s.n_features_in_ if hasattr(s, 'n_features_in_') else len(s.scale_)
+                            if n_features == 1:
+                                final_input = np.hstack([s.transform(current_window_df[[wl_col]].values), current_window_df[[rf_col, wd_col, el_col]].values])
+                                pred_wl_raw = int(round(s.inverse_transform(m(np.expand_dims(final_input, axis=0), training=False).numpy())[0, 0]))
+                            else:
+                                pred_wl_raw = int(round(m(np.expand_dims(s.transform(current_window_df[base_features].values), axis=0), training=False).numpy()[0, 0] * s.scale_[0] + s.min_[0]))
+                            
+                            pred_wl = int(round(pred_wl_raw))
+                            if pred_wl <= 0 or abs(pred_wl - last_obs_wl) > 500:
+                                pred_wl = int(last_obs_wl + (daily_change * i * 0.3))
+                        else:
+                            pred_wl = int(last_obs_wl + (daily_change * i * 0.3))
+                            
+                        station_f_dates.append(curr_f_date)
+                        f_wl.append(pred_wl)
+                        f_rf.append(forecasted_rainfalls[i - 1])
+                        
+                        new_row = current_window_df.iloc[-1].copy()
+                        new_row['Date'] = curr_f_date
+                        new_row[wl_col] = pred_wl
+                        current_window_df = pd.concat([current_window_df.iloc[1:], pd.DataFrame([new_row])])
+                        
+                    final_pred_wl = f_wl[-1]
+                    diff_from_danger = final_pred_wl - danger_level
+                    wl_net_change = final_pred_wl - last_obs_wl
+                    wl_change_display = f"📈 တက်မည် (+{int(wl_net_change)} cm)" if wl_net_change > 0 else (f"📉 ကျမည် ({int(wl_net_change)} cm)" if wl_net_change < 0 else "⚖️ မပြောင်းလဲပါ")
+                    
+                    if final_pred_wl >= danger_level:
+                        status = "🚨 ရေကြီးနိုင်"
+                    elif diff_from_danger >= -100:
+                        status = "🟡 စောင့်ကြည့်ရန်လို"
+                    else:
+                        status = "🟢 စိတ်ချရ"
+                        
+                    summary_results.append({
+                        "📍 Station": st_name, 
+                        dynamic_wl_header: int(last_obs_wl), 
+                        "⚠️ 24-hr Change (cm)": f"+{int(daily_change)}" if daily_change > 0 else f"{int(daily_change)}",
+                        "🌧️ Forecast RF (mm)": round(sum(f_rf), 1), 
+                        f"🔮 Forecasted WL ({lt_val}-Day)": final_pred_wl, 
+                        "📈/📉 Forecast WL Change": wl_change_display,
+                        "⚠️ Danger Level (cm)": danger_level, 
+                        "➕/➖ Diff (cm)": f"+{diff_from_danger}" if diff_from_danger >= 0 else f"{diff_from_danger}", 
+                        "📢 Status": status
+                    })
+                    graphs_store[st_name] = {
+                        'f_dates': station_f_dates, 'f_wl': f_wl, 'f_rf': f_rf, 'danger_level': danger_level,
+                        'recent_df': ts_df[ts_df['Date'] <= target_dt].tail(15).copy(), 'last_obs_wl': last_obs_wl
+                    }
+                except Exception as e:
+                    st.error(f"❌ Error in {st_name}: {e}")
+                    
+            if summary_results:
+                st.session_state.summary_results = summary_results
+                st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
 
+    # 📊 Result Table များကို အပေါ်မျက်နှာပြင်တွင် တိုက်ရိုက်ပြသပေးခြင်း
+    if getattr(st.session_state, 'summary_results', None) and len(st.session_state.summary_results) > 0:
+        st.dataframe(
+            pd.DataFrame(st.session_state.summary_results), 
+            use_container_width=True, 
+            height=480 # Screen မျက်နှာပြင် အပြည့်ပေါ်စေရန် တပ်ဆင်ထားပါသည်
+        )
+        
 # ==============================================================================
 # 📊 TAB 3: SELECTIVE GRAPH VIEW PANEL (STABLE & CORRECTED)
 # ==============================================================================
