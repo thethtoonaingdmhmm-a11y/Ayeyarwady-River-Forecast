@@ -339,8 +339,9 @@ tab1, tab2, tab3 = st.tabs(["ဒေတာအသစ်တင်ရန်(CSV)", "
 # 📂 TAB 1: CSV DATA UPLOAD PANEL (PASSWORD PROTECTED)
 # ==============================================================================
 with tab1:
-    st.markdown("### 📂 CSV File Bulk Upload (Admin Access)")
-    
+    # 💡 CSV Upload Heading ကို သပ်သပ်ရပ်ရပ်နှင့် သေးပေးထားပါသည် (font-size: 16px)
+    st.markdown("<h5 style='font-size: 16px; margin-top: 5px; margin-bottom: 10px;'>📂 CSV File Bulk Upload (Admin Access)</h5>", unsafe_allow_html=True)
+     
     # 🔐 Secret Password သတ်မှတ်ခြင်း (ဒီနေရာမှာ မိမိကြိုက်နှစ်သက်ရာ Password ပြောင်းနိုင်ပါသည်)
     ADMIN_PASSWORD = "Zala@NPT"  # 👈 မိမိထားချင်သည့် Password ကို ဒီမှာ ပြောင်းပါ (ဥပမာ- "dmh2026", "1234")
     
