@@ -208,15 +208,8 @@ def get_weather_forecast_array(lat, lon, lt, base_date_str):
     return [0.0] * days_to_get
 
 # ==============================================================================
-# 🎨 UI TITLE SYSTEM & CSS STYLING (FIXED FORMAT)
+# 🎨 UI TITLE SYSTEM & CSS STYLING (NATIVE STREAMLIT COMPONENT - NO RAW CODE ISSUE)
 # ==============================================================================
-logo_path = 'DMH Logo.png'
-logo_base64 = ""
-if os.path.exists(logo_path):
-    with open(logo_path, "rb") as img_file:
-        logo_base64 = base64.b64encode(img_file.read()).decode()
-
-# CSS Styling (Clean Format to prevent raw text display)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
@@ -264,6 +257,7 @@ st.markdown("""
     div[data-baseweb="input"] input, div[data-baseweb="select"] * {
         font-size: 18px !important;
     }
+    
     div[data-testid="stDataFrame"] {
         font-family: 'Pyidaungsu', 'Segoe UI', sans-serif !important;
     }
@@ -272,41 +266,42 @@ st.markdown("""
         font-size: 18px !important;
     }
     
-    div[data-testid="stDataFrame"] [role="gridcell"],
-    div[data-testid="stDataFrame"] [role="columnheader"],
-    div[data-testid="stDataFrame"] td,
-    div[data-testid="stDataFrame"] th {
-        text-align: left !important;
-        justify-content: flex-start !important;
+    .dept-title {
+        color: #0b6623;
+        font-size: 28px;
+        font-weight: bold;
+        line-height: 1.2;
+        margin-bottom: 4px;
+    }
+    .dash-title {
+        color: #1e5494;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 1.2;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Logo HTML ပြင်ဆင်ခြင်း
-logo_html = f"<div style='flex-shrink: 0; display: flex; align-items: center;'><img src='data:image/png;base64,{logo_base64}' width='125'></div>" if logo_base64 else ""
+# Logo ဖိုင် ရှာဖွေခြင်း
+logo_file_candidates = ['DMH Logo.png', 'DMH_Logo.png', 'dmh_logo.png', 'logo.png']
+found_logo = None
+for l_name in logo_file_candidates:
+    if os.path.exists(l_name):
+        found_logo = l_name
+        break
 
-# Header UI HTML ပြင်ဆင်ခြင်း
-ui_html = f"""<div style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; margin-bottom: 20px; padding: 10px 0;">
-    {logo_html}
-    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
-        <h1 style="color: #0b6623 !important; font-size: 28px !important; font-weight: bold !important; margin: 0 0 4px 0 !important; padding: 0 !important; line-height: 1.2;">
-            မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန
-        </h1>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <h2 style="color: #1e5494 !important; font-size: 19px !important; font-weight: bold !important; margin: 0 !important; padding: 0 !important; line-height: 1.2;">
-                DMH AI Flood Dashboard (Ayeyarwady River)
-            </h2>
-        </div>
-    </div>
-</div><hr style="border: 0; height: 1px; background: #e0e0e0; margin-bottom: 20px;">"""
+# Header ပိုင်းကို Streamlit Native Layout ဖြင့် ပုံဖော်ခြင်း (HTML အကွက်ကြီး ရေးမပြတော့ပါ)
+head_col1, head_col2 = st.columns([1, 7])
 
-st.markdown(ui_html, unsafe_allow_html=True)
+with head_col1:
+    if found_logo:
+        st.image(found_logo, width=110)
 
-if 'GLOBAL_GRAPHS_DATA' not in st.session_state:
-    st.session_state.GLOBAL_GRAPHS_DATA = {}
+with head_col2:
+    st.markdown("<div class='dept-title'>မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန</div>", unsafe_allow_html=True)
+    st.markdown("<div class='dash-title'>DMH AI Flood Dashboard (Ayeyarwady River)</div>", unsafe_allow_html=True)
 
-if 'summary_results' not in st.session_state:
-    st.session_state.summary_results = []
+st.divider()
 
 # ==============================================================================
 # 🗂️ TAB DEFINITION
