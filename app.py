@@ -281,8 +281,12 @@ style_css = """<style>
 </style>"""
 st.markdown(style_css, unsafe_allow_html=True)
 
+# Logo HTML ပြင်ဆင်ခြင်း
+logo_html = f"<div style='flex-shrink: 0; display: flex; align-items: center;'><img src='data:image/png;base64,{logo_base64}' width='125'></div>" if logo_base64 else ""
+
+# Header UI HTML ပြင်ဆင်ခြင်း
 ui_html = f"""<div style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; margin-bottom: 20px; padding: 10px 0;">
-    {"<div style='flex-shrink: 0; display: flex; align-items: center;'><img src='data:image/png;base64," + logo_base64 + "' width='125'></div>" if logo_base64 else ""}
+    {logo_html}
     <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
         <h1 style="color: #0b6623 !important; font-size: 28px !important; font-weight: bold !important; margin: 0 0 4px 0 !important; padding: 0 !important; line-height: 1.2;">
             မိုးလေဝသနှင့်ဇလဗေဒညွှန်ကြားမှုဦးစီးဌာန
@@ -294,6 +298,7 @@ ui_html = f"""<div style="display: flex; align-items: center; justify-content: c
         </div>
     </div>
 </div><hr style="border: 0; height: 1px; background: #e0e0e0; margin-bottom: 20px;">"""
+
 st.markdown(ui_html, unsafe_allow_html=True)
 
 if 'GLOBAL_GRAPHS_DATA' not in st.session_state:
