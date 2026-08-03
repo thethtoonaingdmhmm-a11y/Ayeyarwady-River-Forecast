@@ -528,7 +528,7 @@ with tab2:
                 except Exception as e:
                     st.error(f"❌ Error in {st_name}: {e}")
                     
-           if summary_results:
+if summary_results:
                 st.session_state.summary_results = summary_results
                 st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
 
