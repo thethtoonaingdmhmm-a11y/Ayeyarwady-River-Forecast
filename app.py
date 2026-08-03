@@ -15,18 +15,6 @@ import gspread
 from google.oauth2.service_account import Credentials
 from tensorflow.keras.models import load_model
 
-# ==============================================================================
-# 🌟 SYSTEM INITIALIZATION (ကုဒ်၏ အပေါ်ဆုံးတွင် ထားရန်)
-# ==============================================================================
-if 'base_date' not in st.session_state:
-    st.session_state.base_date = datetime.date.today()
-
-if 'ts_extended' not in st.session_state:
-    st.session_state.ts_extended = None
-
-if 'upload_done' not in st.session_state:
-    st.session_state.upload_done = False
-
 # Plotly Import
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -38,6 +26,18 @@ warnings.filterwarnings('ignore')
 
 # Page Configuration
 st.set_page_config(page_title="DMH AI Flood Dashboard", layout="wide")
+
+# ==============================================================================
+# 🌟 SYSTEM INITIALIZATION (ကုဒ်၏ အပေါ်ဆုံးတွင် ထားရန်)
+# ==============================================================================
+if 'base_date' not in st.session_state:
+    st.session_state.base_date = datetime.date.today()
+
+if 'ts_extended' not in st.session_state:
+    st.session_state.ts_extended = None
+
+if 'upload_done' not in st.session_state:
+    st.session_state.upload_done = False
 
 # ==============================================================================
 # 🌐 2. DYNAMIC PATH ENVIRONMENT GUARD & GOOGLE SHEETS SETUP
@@ -560,7 +560,7 @@ with tab2:
             use_container_width=True, 
             height=580
         )
-        
+
 # ==============================================================================
 # 📊 TAB 3: SELECTIVE GRAPH VIEW PANEL (OPTIMIZED FOR SINGLE SCREEN)
 # ==============================================================================
@@ -688,49 +688,43 @@ with tab3:
                 secondary_y=True
             )
             
-            # 💡 3. Layout Margin နှင့် Height ကို မလိုအပ်ဘဲ အောက်မဆွဲရအောင် 420px သို့ ညှိထားခြင်း
+            # 💡 3. Layout Margin နှင့် Height ညှိယူခြင်း
             fig.update_layout(
-    title=dict(
-        text=f"<b>📊 Hydrograph, Rainfall Trend & Forecast: {st_name}</b>", 
-        x=0.5, 
-        y=0.98,          # 👈 Title ကို အပေါ်သို့ ပိုမြှင့်လိုက်သည်
-        font=dict(size=12) # 👈 Title Font size ကို သေးလိုက်သည်
-    ),
-    margin=dict(l=10, r=10, t=50, b=10), # 👈 Top Margin ကို 50px ပေးပြီး Space ချပေးထားသည်
-    xaxis=dict(
-        type='date',
-        tickformat='%Y-%m-%d',
-        tickangle=-30,
-        dtick=86400000,
-        gridcolor='rgba(128,128,128,0.15)'
-    ),
-    yaxis=dict(
-        title="Water Level (cm)", 
-        side="left", 
-        showgrid=True, 
-        gridcolor='rgba(128,128,128,0.15)'
-    ),
-    yaxis2=dict(
-        title="Rainfall (mm)",
-        side="right",
-        overlaying="y",
-        showgrid=False,
-        autorange="reversed"  
-    ),
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.0,           # 👈 Legend ကို Title အောက်နားတွင် ကွက်တိ ကျစေရန် ညှိထားသည်
-        xanchor="right",
-        x=1,
-        font=dict(size=10)
-    ),
-    hovermode="x unified",
-    height=400 # 👈 Viewport ထဲ ကွက်တိဝင်အောင် Height 400px ထားပေးထားပါသည်
-)
-            
-            # 🚀 Streamlit ပေါ်တွင် Graph ပြသခြင်း
+                title=dict(
+                    text=f"<b>📊 Hydrograph, Rainfall Trend & Forecast: {st_name}</b>", 
+                    x=0.5, 
+                    y=0.98,
+                    font=dict(size=14)
+                ),
+                height=450,
+                margin=dict(l=10, r=10, t=50, b=10),
+                xaxis=dict(
+                    type='date',
+                    tickformat='%Y-%m-%d',
+                    tickangle=-30,
+                    dtick=86400000,
+                    gridcolor='rgba(128,128,128,0.15)'
+                ),
+                yaxis=dict(
+                    title="Water Level (cm)", 
+                    side="left", 
+                    showgrid=True, 
+                    gridcolor='rgba(128,128,128,0.15)'
+                ),
+                yaxis2=dict(
+                    title="Rainfall (mm)",
+                    side="right",
+                    overlaying="y",
+                    showgrid=False,
+                    autorange="reversed"  
+                ),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1
+                )
+            )
+
             st.plotly_chart(fig, use_container_width=True)
-            
-        else:
-            st.error(f"❌ {st_name} စခန်းအတွက် Forecast Graph ဒေတာ မတွေ့ရှိရပါ။")
