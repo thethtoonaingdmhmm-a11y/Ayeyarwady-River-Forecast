@@ -420,6 +420,7 @@ with tab2:
 
     base_date = date_forecast.strftime('%Y-%m-%d')
 
+    # 1. RUN FORECAST LOGIC (ခလုတ်နှိပ်မှ တွက်ချက်မည်)
     if run_btn:
         lt_val = int(lt_forecast)
         target_dt = pd.to_datetime(date_forecast)
@@ -443,11 +444,9 @@ with tab2:
                     if available_past_data.empty or available_past_data[wl_col].isna().all():
                         available_past_data = ts_df[ts_df[wl_col].notna()].copy()
                     
-                   # 💡 ရက်စွဲ Format ပြဿနာမတက်အောင် ISO Format အဖြစ် သေချာပြောင်းလဲခြင်း
                     current_window_df = available_past_data.tail(30).copy()
                     
                     if not current_window_df.empty:
-                        # ISO Format (YYYY-MM-DD) အဖြစ် အတိအကျပြောင်းယူခြင်း
                         last_dt_val = pd.to_datetime(current_window_df.iloc[-1]['Date'], errors='coerce')
                         actual_data_date_str = last_dt_val.strftime('%Y-%m-%d') if pd.notna(last_dt_val) else "No Data"
                     else:
@@ -528,37 +527,39 @@ with tab2:
                 except Exception as e:
                     st.error(f"❌ Error in {st_name}: {e}")
                     
-        if summary_results:
-                        st.session_state.summary_results = summary_results
-                        st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
-        
-            # 📊 Result Table နှင့် Download Button ပြသခြင်း
-            if getattr(st.session_state, 'summary_results', None) and len(st.session_state.summary_results) > 0:
-                df_summary = pd.DataFrame(st.session_state.summary_results)
-        
-                # 📥 CSV Format သို့ ပြောင်းလဲခြင်း (UTF-8 Encoding ပါဝင်သောကြောင့် မြန်မာစာ မပျက်ပါ)
-                csv_download_data = df_summary.to_csv(index=False).encode('utf-8-sig')
-        
-                # 💡 Download Button နှင့် Table စာရင်း ခေါင်းစဉ်ကို ဘေးချင်းယှဉ်ပြသခြင်း
-                dl_col1, dl_col2 = st.columns([7, 3])
-                with dl_col1:
-                    st.markdown("##### 📋 AI Forecast Summary Table")
-                with dl_col2:
-                    st.download_button(
-                        label="📥 Download Results (CSV)",
-                        data=csv_download_data,
-                        file_name=f"Flood_Forecast_{base_date}.csv",
-                        mime="text/csv",
-                        use_container_width=True,
-                        type="secondary"
-                    )
-        
-                # 📊 Table ပြသခြင်း
-                st.dataframe(
-                    df_summary, 
-                    use_container_width=True, 
-                    height=580
-                )
+            if summary_results:
+                st.session_state.summary_results = summary_results
+                st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
+
+    # 2. DISPLAY TABLE & DOWNLOAD BUTTON (if run_btn ရဲ့ အပြင်ဘက်မှာ သီးသန့် ထားပေးထားပါသည်)
+    if getattr(st.session_state, 'summary_results', None) and len(st.session_state.summary_results) > 0:
+        df_summary = pd.DataFrame(st.session_state.summary_results)
+
+        # 📥 CSV Format သို့ ပြောင်းလဲခြင်း
+        csv_download_data = df_summary.to_csv(index=False).encode('utf-8-sig')
+
+        st.markdown("---")
+
+        # 💡 Download Button နှင့် Table စာရင်း ခေါင်းစဉ်
+        dl_col1, dl_col2 = st.columns([7, 3])
+        with dl_col1:
+            st.markdown("##### 📋 AI Forecast Summary Table")
+        with dl_col2:
+            st.download_button(
+                label="📥 Download Results (CSV)",
+                data=csv_download_data,
+                file_name=f"Flood_Forecast_{base_date}.csv",
+                mime="text/csv",
+                use_container_width=True,
+                type="secondary"
+            )
+
+        # 📊 Table ပြသခြင်း
+        st.dataframe(
+            df_summary, 
+            use_container_width=True, 
+            height=580
+        )
         
 # ==============================================================================
 # 📊 TAB 3: SELECTIVE GRAPH VIEW PANEL (OPTIMIZED FOR SINGLE SCREEN)
