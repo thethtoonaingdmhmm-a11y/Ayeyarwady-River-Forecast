@@ -424,7 +424,10 @@ with tab2:
     if run_btn:
         lt_val = int(lt_forecast)
         target_dt = pd.to_datetime(date_forecast)
-        ts_df = st.session_state.ts_extended
+        ts_df = st.session_state.ts_extended.copy()
+        
+        # 💡 Date column ကို datetime format သို့ သေချာ ပြောင်းလဲပေးခြင်း
+        ts_df['Date'] = pd.to_datetime(ts_df['Date'], errors='coerce')
         
         with st.spinner("⏳ AI Forecast တွက်ချက်နေပါသည်..."):
             summary_results = []
