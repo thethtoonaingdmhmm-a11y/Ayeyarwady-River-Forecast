@@ -528,37 +528,37 @@ with tab2:
                 except Exception as e:
                     st.error(f"❌ Error in {st_name}: {e}")
                     
-if summary_results:
-                st.session_state.summary_results = summary_results
-                st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
-
-    # 📊 Result Table နှင့် Download Button ပြသခြင်း
-    if getattr(st.session_state, 'summary_results', None) and len(st.session_state.summary_results) > 0:
-        df_summary = pd.DataFrame(st.session_state.summary_results)
-
-        # 📥 CSV Format သို့ ပြောင်းလဲခြင်း (UTF-8 Encoding ပါဝင်သောကြောင့် မြန်မာစာ မပျက်ပါ)
-        csv_download_data = df_summary.to_csv(index=False).encode('utf-8-sig')
-
-        # 💡 Download Button နှင့် Table စာရင်း ခေါင်းစဉ်ကို ဘေးချင်းယှဉ်ပြသခြင်း
-        dl_col1, dl_col2 = st.columns([7, 3])
-        with dl_col1:
-            st.markdown("##### 📋 AI Forecast Summary Table")
-        with dl_col2:
-            st.download_button(
-                label="📥 Download Results (CSV)",
-                data=csv_download_data,
-                file_name=f"Flood_Forecast_{base_date}.csv",
-                mime="text/csv",
-                use_container_width=True,
-                type="secondary"
+    if summary_results:
+                    st.session_state.summary_results = summary_results
+                    st.session_state.GLOBAL_GRAPHS_DATA = graphs_store
+    
+        # 📊 Result Table နှင့် Download Button ပြသခြင်း
+        if getattr(st.session_state, 'summary_results', None) and len(st.session_state.summary_results) > 0:
+            df_summary = pd.DataFrame(st.session_state.summary_results)
+    
+            # 📥 CSV Format သို့ ပြောင်းလဲခြင်း (UTF-8 Encoding ပါဝင်သောကြောင့် မြန်မာစာ မပျက်ပါ)
+            csv_download_data = df_summary.to_csv(index=False).encode('utf-8-sig')
+    
+            # 💡 Download Button နှင့် Table စာရင်း ခေါင်းစဉ်ကို ဘေးချင်းယှဉ်ပြသခြင်း
+            dl_col1, dl_col2 = st.columns([7, 3])
+            with dl_col1:
+                st.markdown("##### 📋 AI Forecast Summary Table")
+            with dl_col2:
+                st.download_button(
+                    label="📥 Download Results (CSV)",
+                    data=csv_download_data,
+                    file_name=f"Flood_Forecast_{base_date}.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                    type="secondary"
+                )
+    
+            # 📊 Table ပြသခြင်း
+            st.dataframe(
+                df_summary, 
+                use_container_width=True, 
+                height=580
             )
-
-        # 📊 Table ပြသခြင်း
-        st.dataframe(
-            df_summary, 
-            use_container_width=True, 
-            height=580
-        )
         
 # ==============================================================================
 # 📊 TAB 3: SELECTIVE GRAPH VIEW PANEL (OPTIMIZED FOR SINGLE SCREEN)
